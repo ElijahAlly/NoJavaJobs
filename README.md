@@ -25,7 +25,7 @@ Heres an article that lists 48 job boards for software engineers <a href="ttps:/
 
 <br/>
 
-# Can we garuntee that once you get hired, you won't be using Java?
+# Can we guarantee that once you get hired, you won't be using Java?
 
 Sadly, we can't due to the flexible nature of companies. 
 
