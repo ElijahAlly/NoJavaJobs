@@ -1,0 +1,30 @@
+export type DiceJobType = {
+    _id: string,
+    title: string,
+    company: string,
+    company_link?: string,
+    company_logo?: string,
+    location?: string,
+    job_link?: string,
+    employment_details?: string,
+    employment_pay?: string,
+    description_list?: string,
+    employment_skills?: string,
+    date_posted: string,
+    date_updated?: string,
+}
+
+export type NewDiceJobType = {
+    title: string,
+    company: string,
+    company_link?: string,
+    company_logo?: string,
+    location?: string,
+    job_link?: string,
+    employment_details?: string,
+    employment_pay?: string,
+    description_list?: string,
+    employment_skills?: string,
+    date_posted: string,
+    date_updated?: string,
+}
