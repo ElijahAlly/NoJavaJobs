@@ -22,6 +22,7 @@ class DiceSpider(scrapy.Spider):
         'page': '1',
         # * Recommended page size is 20 (when more results desired, increase page count in # Pagination logic)
         # * Why? (larger pages of 100 take exponentially more time with each page)
+        'pageSize': '20',
         'filters.postedDate': 'SEVEN',
         'language': 'en'
     }
@@ -135,7 +136,7 @@ class DiceSpider(scrapy.Spider):
 
         # Pagination logic
         current_page = response.meta.get('page', 1) # grab current page number (or set to 1 if <empty/null/None/undefined/etc>)
-        if current_page < 10:  # * Limit to first {10} pages, currently {100} results per page
+        if current_page < 1:  # * Limit to first {1} pages, currently {20} results per page
             self.traversed_pages_count += 1
             next_page = current_page + 1
             next_page_url = self.construct_url(page=next_page)
