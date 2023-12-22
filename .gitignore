@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # mongodb
 dev_keys.js
+
+# scrapy
+outputs/

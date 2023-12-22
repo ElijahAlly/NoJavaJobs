@@ -57,6 +57,7 @@ def closeOutScraperHelper(start_time, base_url, query_params, traversed_pages_co
         print(f"   {GREEN}   Scraped: {base_url}")
         if query_params and query_params['q']:
             print(f"   {GREEN}   Query: {formatQuery(query_params['q'])}")
+            print(f"   {GREEN}   Page Size: {query_params['pageSize'] and (scraped_jobs_count / query_params['pageSize'])}")
             print(f"   {GREEN}   Page Size: {query_params['pageSize'] or "Infinite Scroll"}")
             print(f"   {GREEN}   Day Range: {formatDayRange(query_params['filters.postedDate'])}")
         print(f"   {WHITE}***********************************{RESET}\n")

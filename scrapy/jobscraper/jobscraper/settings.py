@@ -6,6 +6,7 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+from datetime import datetime
 
 BOT_NAME = "jobscraper"
 
@@ -93,9 +94,12 @@ REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
+current_time = datetime.now().strftime("%b_%d_%Y-%I:%M-%p")
+file_name = f"outputs/output_{current_time}.csv"
+
 FEEDS = {
-    'output.csv': {
+    file_name: {
         'format': 'csv',
-        'overwrite': True
+        'overwrite': False 
     },
 }
