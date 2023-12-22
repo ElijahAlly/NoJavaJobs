@@ -9,22 +9,14 @@ from datetime import datetime
 import pytz
 from ..pipeline_util import should_filter_out_java, closeOutScraperHelper
 
-class DiceSpider(scrapy.Spider):
-    name = "dice_spider"
-    allowed_domains = ["dice.com"]
+class AngelListSpider(scrapy.Spider):
+    name = "angellist_spider"
+    allowed_domains = ["wellfound.com"]
     # Base URL and constant parameters
-    base_url = "https://www.dice.com/jobs"
-    query_params = {
-        'q': 'software%20developer', # search query (change for different results)
-        'countryCode': 'US',
-        'radius': '30',
-        'radiusUnit': 'mi',
-        'page': '1',
-        # * Recommended page size is 20 (when more results desired, increase page count in # Pagination logic)
-        # * Why? (larger pages of 100 take exponentially more time with each page)
-        'filters.postedDate': 'SEVEN',
-        'language': 'en'
-    }
+    base_url = "https://wellfound.com/jobs"
+    # query_params = {
+    #     'q': 'software%20engineer', # search query (change for different results)
+    # }
 
     def __init__(self):
         self.start_time = datetime.now() # used to calculate total elapsed time when finished
@@ -36,15 +28,7 @@ class DiceSpider(scrapy.Spider):
 
     def start_requests(self):
         # Construct the starting URL
-        start_url = self.construct_url(page=1)
-        yield scrapy.Request(start_url, meta={'page': 1})
-
-    def construct_url(self, page):
-        # Update the page number in the query parameters
-        self.query_params['page'] = str(page)
-
-        # Construct and return the full URL
-        return f"{self.base_url}?{'&'.join(f'{key}={value}' for key, value in self.query_params.items())}"
+        yield scrapy.Request(self.base_url)
 
     def parse(self, response):
         self.driver.get(response.url) # navigate to link
@@ -52,7 +36,7 @@ class DiceSpider(scrapy.Spider):
 
         # get all cards from search result link
         job_cards = WebDriverWait(self.driver, 6).until(
-            EC.presence_of_all_elements_located((By.XPATH, '//*[@data-cy="search-card"]'))
+            EC.presence_of_all_elements_located((By.XPATH, '//*[@data-test="StartupResult"]'))
         )
         # self.driver.find_elements(By.XPATH, '//*[@data-cy="search-card"]')
 
@@ -67,79 +51,85 @@ class DiceSpider(scrapy.Spider):
                 'company': "",
                 'company_link': "",
                 'company_logo': "",
-                'location': "",
+                'locations': "",
                 'job_link': "",
                 'employment_details': "",
                 'employment_pay': "",
                 'description_list': "",
                 'employment_skills': "",
-                'easy_apply': "False",
+                'company_attributes': "",
                 'date_posted': "",
-                'date_updated': "Updated Never",
                 'scraped_at': "", 
             }
 
             try:
-                job_id = job_card.find_element(By.XPATH, './/div/div[1]/div/div[2]/div[1]/h5/a').get_attribute("id")
-                job_link = f"https://www.dice.com/job-detail/{job_id}"
-                item["job_link"] = job_link
+                job_links = job_card.find_element(By.XPATH, ".//div[2]/div[1]")
+                job_link_count = 1
+                for job_link in job_links:
+                    item["job_link"] += f", {self.base_url}{job_link.find_element(By.XPATH, f".//div[{job_link_count}]/a").get_attribute("href")}"
+                    job_link_count += 1
             except NoSuchElementException: 
                 print("no job_link found") 
 
             try:
-                item["company"] = job_card.find_element(By.XPATH, './/div/div[1]/div/div[2]/div[1]/div/a').text
+                item["company"] = job_card.find_element(By.XPATH, './/div[1]/a[1]/div[2]/div[1]/div[1]/h2').text
             except NoSuchElementException: 
                 print("no company found")
 
             try:
-                item["company_link"] = job_card.find_element(By.XPATH, './/div/div[1]/div/div[2]/div[1]/div/a').get_attribute("href")
+                item["company_link"] = f"{self.base_url}{job_card.find_element(By.XPATH, './/div[1]/a[1]').get_attribute("href")}"
             except NoSuchElementException: 
                 print("no company_link found")
 
             try:
-                item["company_logo"] = job_card.find_element(By.XPATH, './/div/div[1]/dhi-company-logo/div/p/a/img').get_attribute("src")
+                item["company_logo"] = job_card.find_element(By.XPATH, './/div[1]/a[1]/div[1]/img').get_attribute("src")
             except NoSuchElementException: 
                 print("no company_logo found")
 
             try:
-                item["location"] = job_card.find_element(By.XPATH, './/div/div[1]/div/div[2]/div[1]/div/span').text
+                locations = job_card.find_element(By.XPATH, ".//div[2]/div[1]/div[1]/a[1]/div[1]/span[1]/span[1]")
+                locations_count = 1
+                for location in locations:
+                    item["locations"] += f", {location.find_element(By.XPATH, f".//span[{locations_count}]").text}"
+                    locations_count += 1
             except NoSuchElementException: 
                 print("no location found")
 
             try:
-                item["title"] = job_card.find_element(By.XPATH, './/div/div[1]/div/div[2]/div[1]/h5/a').text
+                item["title"] = job_card.find_element(By.XPATH, ".//div[2]/div[1]/div[1]/a[1]/div[1]/div[1]/span[1]").text
             except NoSuchElementException: 
                 print("no title found")
 
             try:
-                ele_text = job_card.find_element(By.XPATH, './/div/div[2]/div[3]/div').text
-                if (ele_text and 'easy apply' in ele_text.lower()):
-                    item["easy_apply"] = 'True'
-            except NoSuchElementException: 
+                company_attributes = job_card.find_element(By.XPATH, './/ul')
+                attr_count = 1
+                for attribute in company_attributes:
+                    item["company_attributes"] += f", {attribute.find_element(By.XPATH, f".//li[{attr_count}]").text}"
+                    attr_count += 1
+            except NoSuchElementException:
                 print("no easy_apply found")
 
             try:
-                item["date_posted"] = job_card.find_element(By.XPATH, './/div/div[2]/div[1]/div[2]/span[1]').text
-            except NoSuchElementException: 
+                jobs = job_card.find_element(By.XPATH, './/div[2]/div[1]')
+                jobs_count = 1
+                for job in jobs:
+                    item["date_posted"] = job.find_element(By.XPATH, f".//div[{jobs_count}]/a[1]/div[2]/span[2]").text
+                    jobs_count += 1
+            except NoSuchElementException:
                 print("no date_posted found")
 
-            try:
-                item["date_updated"] = job_card.find_element(By.XPATH, './/div/div[2]/div[1]/div[2]/span[2]').text
-            except NoSuchElementException: 
-                print("never updated")
-            
             timezone = pytz.timezone("US/Eastern") # get timezone
             item["scraped_at"] = datetime.now(timezone).strftime("%Y-%m-%d %H:%M:%S") # get current time and format
 
             yield scrapy.Request(response.urljoin(item["job_link"]), callback=self.parse_job_details, meta={'item': item})
 
-        # Pagination logic
-        current_page = response.meta.get('page', 1) # grab current page number (or set to 1 if <empty/null/None/undefined/etc>)
-        if current_page < 10:  # * Limit to first {10} pages, currently {100} results per page
-            self.traversed_pages_count += 1
-            next_page = current_page + 1
-            next_page_url = self.construct_url(page=next_page)
-            yield scrapy.Request(next_page_url, callback=self.parse, meta={'page': next_page})
+        # # Pagination logic
+        # current_page = response.meta.get('page', 1) # grab current page number (or set to 1 if <empty/null/None/undefined/etc>)
+        # if current_page < 10:  # * Limit to first {10} pages, currently {100} results per page
+        #     self.traversed_pages_count += 1
+        #     next_page = current_page + 1
+        #     next_page_url = self.construct_url(page=next_page)
+        #     yield scrapy.Request(next_page_url, callback=self.parse, meta={'page': next_page})
 
     def parse_job_details(self, response):
         self.traversed_pages_count += 1 # each job post is a new page visited
@@ -190,7 +180,7 @@ class DiceSpider(scrapy.Spider):
         closeOutScraperHelper(
             self.start_time,
             self.base_url,
-            self.query_params,
+            {},
             self.traversed_pages_count,
             self.scraped_jobs_count,
             self.excluded_jobs_count,

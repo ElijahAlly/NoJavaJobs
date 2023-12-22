@@ -1,0 +1,8 @@
+# * Install required libraries to run spiders
+# 1) Navigate to scrapy/jobscraper/ in terminal 
+# 2) Use this command: 
+# pip install -r requirements.txt
+
+selenium==3.141.0
+scrapy==2.11.0
+pytz
