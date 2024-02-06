@@ -7,7 +7,7 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 from datetime import datetime
 import pytz
-from ..pipeline_util import should_filter_out_java, closeOutScraperHelper
+from ..pipeline_util import * 
 
 class DiceSpider(scrapy.Spider):
     name = "dice_spider"
@@ -19,7 +19,7 @@ class DiceSpider(scrapy.Spider):
         'countryCode': 'US',
         'radius': '30',
         'radiusUnit': 'mi',
-        'page': '3',
+        'page': '1',
         # * Recommended page size is 20 (when more results desired, increase page count in # Pagination logic)
         # * Why? (larger pages of 100 take exponentially more time with each page)
         'pageSize': '20',
@@ -58,9 +58,9 @@ class DiceSpider(scrapy.Spider):
         # self.driver.find_elements(By.XPATH, '//*[@data-cy="search-card"]')
 
         for job_card in job_cards:
-            # time.sleep(1) # pause for 1 second before continuing to next job card (recommended for smoother scrolling) # ! Do not exceed 3, unless you want looong pauses
+            time.sleep(1) # pause for 1 second before continuing to next job card (recommended for smoother scrolling) # ! Do not exceed 3, unless you want looong pauses
             # Scroll the job card into view using JavaScript
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", job_card)
+            self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth' });", job_card)
 
             self.scraped_jobs_count += 1
             item = {
@@ -135,8 +135,8 @@ class DiceSpider(scrapy.Spider):
             yield scrapy.Request(response.urljoin(item["job_link"]), callback=self.parse_job_details, meta={'item': item})
 
         # Pagination logic
-        current_page = response.meta.get('page', 3) # grab current page number (or set to 1 if <empty/null/None/undefined/etc>)
-        if current_page < 3:  # * Limit to first {1} pages, currently {20} results per page
+        current_page = response.meta.get('page', 1) # grab current page number (or set to 1 if <empty/null/None/undefined/etc>)
+        if current_page < 1:  # * Limit to first {1} pages, currently {20} results per page
             self.traversed_pages_count += 1
             next_page = current_page + 1
             next_page_url = self.construct_url(page=next_page)

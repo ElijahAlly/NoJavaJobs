@@ -14,7 +14,7 @@ class IndeedSpider(scrapy.Spider):
         self.driver.get(response.url)
         time.sleep(2)  # Let JavaScript Content Load
 
-        job_cards = self.driver.find_elements_by_xpath('//div[contains(@class, "jobsearch-SerpJobCard")]')
+        job_cards = self.driver.find_elements_by_xpath('//div[contains(@class, "jobsearch-SerpJobCard")]') # jobListItem
         for job_card in job_cards:
             title = job_card.find_element_by_xpath('.//h2').text
             link = job_card.find_element_by_xpath('.//h2/a').get_attribute('href')

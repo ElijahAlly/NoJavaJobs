@@ -95,7 +95,7 @@ TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
 current_time = datetime.now().strftime("%b_%d_%Y-%I:%M-%p")
-file_name = f"outputs/output_{current_time}.csv"
+file_name = f"outputs/_jobs_{current_time}.csv"
 
 FEEDS = {
     file_name: {
