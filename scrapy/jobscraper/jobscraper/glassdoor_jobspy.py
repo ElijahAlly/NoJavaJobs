@@ -64,6 +64,36 @@ for keyword in tqdm(keywords, desc="Filtering jobs mentioning java...", colour='
     excluded_jobs_count += (before_filtering - after_filtering)
     time.sleep(1)
 
+# Phrases to include (case does not matter)
+include_phrases = [
+    'software',
+    'developer',
+    'software engineer',
+    'software developer',
+    'software development',
+    'frontend',
+    'backend',
+    'web developer',
+    'devops'
+    'dev ops'
+]
+
+# Use a regular expression to match whole phrases case-insensitively
+# Iterate over each phrase to filter the DataFrame, accumulating the matching jobs
+included_jobs = pd.DataFrame(columns=jobs.columns)  # Temporary DataFrame to hold included jobs
+
+for phrase in tqdm(include_phrases, desc="Including specific software jobs...", colour='yellow'):
+    pattern = rf'\b{phrase}\b'
+    # Filter the DataFrame using the regular expression for whole phrase match
+    # The `na=False` parameter is used to handle NaN values in the 'description' column
+    matching_jobs = jobs[jobs['title'].str.contains(pattern, case=False, na=False, regex=True)]
+    # Append matching jobs to the included_jobs DataFrame
+    included_jobs = pd.concat([included_jobs, matching_jobs], ignore_index=True)
+    time.sleep(0.6)
+
+# Assign the filtered DataFrame back to `jobs`
+jobs = included_jobs
+
 def calculate_salary(row):
     if pd.notnull(row['min_amount']) and pd.notnull(row['max_amount']):
         salary = f"{row['currency']} {row['min_amount']}-{row['max_amount']} {row['interval']}"

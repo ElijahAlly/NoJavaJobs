@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoJavaJobs API v1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <section class="header">
+        <h1>Hello world! Welcome to NoJavaJobs API</h1>
+        <p>Developed By MusaByte</p>
+        <p>
+            View on GitHub:
+            <a href="https://github.com/ElijahAlly/NoJavaJobs">https://github.com/ElijahAlly/NoJavaJobs</a>
+        </p>
+        <img target="_blank" src="https://raw.githubusercontent.com/ElijahAlly/NoJavaJobs/main/src/assets/NoJavaJobs-Logo.png" height="300" width="auto" alt="NoJavaJobsLogo"/>
+    </section>
+    <section class="api-data-interface">
+        <h1>API Data Interface</h1>
+        <div>
+            <span>http://host:5005/api/</span>
+            <input type="text" id="searchPath" placeholder="Enter search path">
+        </div>
+        <input type="text" id="searchInput" placeholder="Enter search query">
+        <button onclick="fetchData()">Search</button>
+    </section>
+    <section class="data-results">
+        <div id="results">
+            <!-- Results will be displayed here -->
+        </div>
+    </section>
+    <script src="script.js"></script>
+</body>
+</html>

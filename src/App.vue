@@ -21,10 +21,13 @@ nav {
 
   a {
     font-weight: bold;
-    color: #2c3e50;
+    // color: #03040d; // black
+    // color: #132634; // gray darker
+    color: #486071; // gray lighter 
 
     &.router-link-exact-active {
-      color: #42b983;
+      color: #f66d65; // red darker
+      // color: #fe6662; // red lighter
     }
   }
 }

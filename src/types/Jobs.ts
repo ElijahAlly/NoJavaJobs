@@ -1,4 +1,42 @@
-export type DiceJobType = {
+export type JobType = {
+    _id: string,
+    title: string,
+    company: string,
+    company_link?: string,
+    company_logo?: string,
+    location?: string,
+    job_link: string,
+    is_remote?: boolean,
+    easy_apply?: boolean,
+    job_board?: string,
+    employment_details?: string,
+    employment_pay?: string,
+    description_list?: string,
+    employment_skills?: string,
+    date_posted: string,
+    date_updated?: string,
+    scraped_at: string,
+}
+
+export type NewJobType = {
+    title: string,
+    company: string,
+    company_link?: string,
+    company_logo?: string,
+    location?: string,
+    job_link?: string,
+    is_remote?: boolean,
+    easy_apply?: boolean,
+    job_board?: string,
+    employment_details?: string,
+    employment_pay?: string,
+    description_list?: string,
+    employment_skills?: string,
+    date_posted: string,
+    date_updated?: string,
+}
+
+export type TopTechJobType = {
     _id: string,
     title: string,
     company: string,
@@ -14,7 +52,7 @@ export type DiceJobType = {
     date_updated?: string,
 }
 
-export type NewDiceJobType = {
+export type NewTopTechJobType = {
     title: string,
     company: string,
     company_link?: string,

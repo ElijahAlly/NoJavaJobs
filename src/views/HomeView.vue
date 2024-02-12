@@ -1,18 +1,25 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <img alt="Vue logo" src="../assets/NoJavaJobs-Logo-Background.png" id="app-logo"/>
   </div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import HelloWorld from "@/components/HelloWorld.vue"; 
 
 @Options({
   components: {
-    HelloWorld,
+
   },
 })
 export default class HomeView extends Vue {}
 </script>
+
+<style lang="scss" scoped>
+#app-logo {
+  border-radius: 21px;
+  padding: 0;
+  margin: 0;
+  width: 120px;
+}
+</style>
