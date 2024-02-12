@@ -73,6 +73,8 @@ class DiceSpider(scrapy.Spider):
                 'employment_details': "",
                 'employment_pay': "",
                 'description_list': "",
+                'job_board': "Dice",
+                'is_remote': "False",
                 'employment_skills': "",
                 'easy_apply': "False",
                 'date_posted': "",
@@ -184,7 +186,12 @@ class DiceSpider(scrapy.Spider):
             print(f"Excluding job post: {item['job_link']} as it mentions Java in the title, skills, or description.")
             self.excluded_jobs_count += 1
             return # Exclude this item
-
+        
+        if (has_remote_text(item['title'])) or \
+            (has_remote_text(item['description_list'])) or \
+            any(has_remote_text(skill) for skill in item['employment_skills']): 
+            item['is_remote'] = "True"
+            
         yield item
 
     def closed(self, reason):

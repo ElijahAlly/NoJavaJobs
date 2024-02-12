@@ -2,6 +2,17 @@ import re
 from datetime import datetime
 from urllib.parse import unquote
 
+# ANSI escape codes for different colors
+RED = '\033[91m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+BLUE = '\033[34m'
+MAGENTA = '\033[95m'
+CYAN = '\033[96m'
+WHITE = '\033[97m'
+GRAY = '\033[90m'
+RESET = '\033[0m' # Reset to default color
+
 def should_filter_out_java(text):
     # Convert text to lowercase for case-insensitive matching
     text_lower = text.lower()
@@ -15,6 +26,26 @@ def should_filter_out_java(text):
         return True
 
     # Do not filter out if no 'Java' is found
+    return False
+
+def has_remote_text(text):
+    # Convert text to lowercase for case-insensitive matching
+    text_lower = text.lower()
+
+    # Using regular expressions to find standalone 'remote'
+    remote_pattern = r'\bremote\b'
+    not_remote_pattern = r'\bnot remote\b'
+    not_a_remote_pattern = r'\bnot a remote\b'
+    remote_match = re.search(remote_pattern, text_lower)
+
+    # Filter out if 'remote' is found
+    if remote_match is not None and (
+            not_remote_pattern is None
+            and not_a_remote_pattern is None 
+        ):
+        return True
+
+    # if no 'remote' is found
     return False
 
 def convert_redirect_link(redirect_link):
@@ -75,16 +106,6 @@ def closeOutScraperHelper(start_time, base_url, query_params, traversed_pages_co
     # Format the elapsed time
     elapsed_time_formatted = str(elapsed_time).split('.')[0]  # Removing microseconds
 
-    # ANSI escape codes for different colors
-    RED = '\033[91m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[34m'
-    MAGENTA = '\033[95m'
-    CYAN = '\033[96m'
-    WHITE = '\033[97m'
-    GRAY = '\033[90m'
-    RESET = '\033[0m' # Reset to default color
 
     print(f"\n\n")
     print(f"   {WHITE}***********************************{RESET}")
@@ -145,3 +166,53 @@ def get_toptech_job_ids():
         "59AFC77CBFAA1D25B2#8024E8C13A15B09BC6#B1585630935B7666ED#3200CE0538C1A6DF8C#85203A6877C35A8E39#B738022E05170AF0EF#68A6CFAC2EB5234A7C#810A5D411F43C9CB0F#5A36A3F62CE147689A#9714D8A80DBF70262B#7BAEBFA14D47B3FBA5#253CE0DE4FEB7018DD#98D6B3801EA5EF5E7C#B6707ED9B4A11E8350#4CDE2F889A2D730608#50403A3F4A157A5D02#9F9E0F9D51F79BC719#BED2454000B9F1C6CA#124C708F6099F81D40#181DF94FEE2ADD0544#475CE125F111B000CD#B2791BCF7C46E50847#DFBDADC229801D4FD2#BBFA6A4449BD86C9E8#5709E98299FDB2DCBB",
         "AC33B4280E6A806D95#0BFE402A41348F019D#D7D23E9CE545A24114#425ACE7B5843529A57#5CA8F5D8520F1DC51F#00F52ED4A2F01A1995#8D9BBD7E6B327BAF60#AF8C3B1FC91D138E92#8BF6B8CAE195A47F44#58E2DE154A1F62B461#C958A93B5F09D1BA34#A6AE64C194C318A02F#8331FF78D5A0D7DD92#7A313367344E73C6A5#0B26DC8EB135D063EC#B5062CDCCF18738F22#A1BDC1C4971C59F1A0#097EB0DCE3018489AA#1719B3C0B1C8AB55E6#7EBFEE48546602ADD7#E973F03BA34C1C7AA6#394D16EFE36EEA3E5A#67AB5445953848B4C4#1241DFF3BCDEDF9A85#F82A0AE9B217DED811",
     ] # jobs from query: software engineer
+
+
+
+
+
+# * Dice 
+# 'title': "",
+# 'company': "",
+# 'company_link': "",
+# 'company_logo': "",
+# 'location': "",
+# 'job_link': "",
+# 'employment_details': "",
+# 'employment_pay': "",
+# 'description_list': "",
+# 'job_board': "Dice",
+# 'employment_skills': "",
+# 'easy_apply': "False",
+# 'date_posted': "",
+# 'date_updated': "Updated Never",
+# 'scraped_at': "", 
+
+# * TopTechJobs
+# 'title': "",
+# 'company': "",
+# 'company_link': "",
+# 'location': "",
+# 'job_link': "",
+# 'employment_pay': "",
+# 'description_list': "",
+# 'job_board': "TopTechJobs",
+# 'date_posted': "",
+# 'scraped_at': "",
+
+# * Indeed
+# 'title': "",
+# 'company': "",
+# 'company_link': "",
+# 'company_logo': "",
+# 'location': "",
+# 'job_link': "",
+# 'employment_details': "",
+# 'employment_pay': "",
+# 'description_list': "",
+# 'job_board': "LinkedIn",
+# 'employment_skills': "",
+# 'easy_apply': "False",
+# 'date_posted': "",
+# 'date_updated': "",
+# 'scraped_at': "", 

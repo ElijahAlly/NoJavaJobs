@@ -3,9 +3,12 @@
 # 2) Use this command: 
 # pip3 install -r requirements.txt
 
-selenium==3.141.0
-scrapy==2.11.0
+selenium
+scrapy
 pytz
 python-jobspy
 pandas
 tqdm
+
+# selenium==3.141.0
+# scrapy==2.11.0

@@ -1,17 +1,13 @@
 import pandas as pd
 from jobspy import scrape_jobs
-from datetime import datetime, timedelta
+from datetime import datetime 
 from tqdm import tqdm
 import time
 import threading
-from pipeline_util import closeOutScraperHelper
+from pipeline_util import closeOutScraperHelper, CYAN, RESET
 
 # Global variable to control the timer
 timer_running = True
-GREEN = '\033[92m'
-CYAN = '\033[96m'
-RED = '\033[91m'
-RESET = '\033[0m'
 
 def background_timer(start_time):
     while timer_running:
@@ -30,13 +26,14 @@ excluded_jobs_count = 0
 timer_thread = threading.Thread(target=background_timer, args=(start_time,))
 timer_thread.start()
 
-results_wanted = 420
+results_wanted = 99
 search_term = "software engineer"
 jobs = scrape_jobs(
-    site_name=["linkedin"], # "indeed", "zip_recruiter", "glassdoor"
+    site_name=["indeed"], # "linkedin", "zip_recruiter", "glassdoor"
     search_term=search_term,
     results_wanted=results_wanted,
-    full_description=True # fetches full description for Indeed / LinkedIn (much slower) 
+    full_description=True, # fetches full description for Indeed / LinkedIn (much slower) 
+    country_indeed='USA', # only needed for indeed / glassdoor
 )
 # Options:
 # location="Dallas, TX",
@@ -49,7 +46,6 @@ jobs = scrape_jobs(
 # linkedin_company_ids (list[int): searches for linkedin jobs with specific company ids
 # country_indeed (enum): filters the country on Indeed (see below for correct spelling)
 # offset (num): starts the search from an offset (e.g. 25 will start the search from the 25th result)
-# country_indeed='USA', # only needed for indeed / glassdoor
 
 keywords = ['java', 'angular', 'php'] # keywords to filter out (case does not matter, see case=False in str.contains below)
 
@@ -83,9 +79,13 @@ jobs['employment_pay'] = jobs.apply(calculate_salary, axis=1)
 current_time = datetime.now().strftime("%b_%d_%Y-%I:%M-%p")
 
 # 1) Add new columns with an empty string
-new_columns = ['date_updated', 'company_logo', 'employment_pay', 'employment_skills', 'easy_apply', 'scraped_at']
+new_columns = ['job_board', 'date_updated', 'company_logo', 'employment_pay', 'employment_skills', 'easy_apply', 'scraped_at']
 for column in new_columns:
-    if (column == 'scraped_at'):
+    if (column == 'job_board'):
+        jobs[column] = f"Indeed"
+    elif (column == 'easy_apply'):
+        jobs[column] = f"False"
+    elif (column == 'scraped_at'):
         jobs[column] = f" {current_time}"
     else:
         jobs[column] = ''
@@ -93,24 +93,25 @@ for column in new_columns:
 # 2) Change column names
 jobs.rename(columns={
     'description': 'description_list',
-    'job_type': 'employment_details'
+    'job_type': 'employment_details',
+    'company_url': 'company_link',
+    'job_url': 'job_link'
 }, inplace=True)
 
 # 3) Remove unwanted columns
-columns_to_remove = ['site', 'interval', 'min_amount', 'max_amount', 'currency', 'is_remote', 'num_urgent_words', 'emails', 'benefits']
+columns_to_remove = ['site', 'interval', 'min_amount', 'max_amount', 'currency', 'num_urgent_words', 'emails', 'benefits']
 jobs.drop(columns=columns_to_remove, inplace=True)
-
 
 closeOutScraperHelper(
     start_time,
-    "https://linkedin.com",
+    "https://indeed.com",
     { "q": search_term },
     traversed_pages_count,
     results_wanted,
     excluded_jobs_count,
 )
 
-jobs.to_csv(f"jobspy_outputs/job_spy_linkedin_{current_time}.csv", index=False) # to_xlsx
+jobs.to_csv(f"jobspy_outputs/indeed_jobspy_{current_time}.csv", index=False) # to_xlsx
 
 # Indicate that the main script has finished
 timer_running = False

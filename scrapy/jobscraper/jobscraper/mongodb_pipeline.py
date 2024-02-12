@@ -1,0 +1,1 @@
+# consult with ChatGpt to add MongoDb pipeline. Add jobs to collection right after scraping 
