@@ -4,7 +4,7 @@ import { API_BASE_URL } from "./api_utils/all_api";
 // Fetch all jobs
 export const fetchAllJobs = async (): Promise<JobType[]> => {
   try {
-    console.log('API_BASE_URL', API_BASE_URL)
+    // console.log('API_BASE_URL', API_BASE_URL)
     const response = await fetch(`${API_BASE_URL}/api/jobs`, {
       method: "GET",
       headers: {
@@ -12,7 +12,7 @@ export const fetchAllJobs = async (): Promise<JobType[]> => {
         // 'Authorization': `Bearer ${yourAuthToken}`,
       },
     });
-    console.log('jobs', response);
+    // console.log('jobs', response);
     if (!response.ok) {
       throw new Error(`Error: ${response.status}`);
     }

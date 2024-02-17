@@ -8,8 +8,9 @@
 </template>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+#app, body, html {
+  overflow-x: hidden;
+  font-family: 'Palantino';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

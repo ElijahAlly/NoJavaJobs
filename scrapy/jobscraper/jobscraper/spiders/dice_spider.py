@@ -74,9 +74,9 @@ class DiceSpider(scrapy.Spider):
                 'employment_pay': "",
                 'description_list': "",
                 'job_board': "Dice",
-                'is_remote': "False",
+                'is_remote': False,
                 'employment_skills': "",
-                'easy_apply': "False",
+                'easy_apply': False,
                 'date_posted': "",
                 'date_updated': "Updated Never",
                 'scraped_at': "", 
@@ -117,7 +117,7 @@ class DiceSpider(scrapy.Spider):
             try:
                 ele_text = job_card.find_element(By.XPATH, './/div/div[2]/div[3]/div').text
                 if (ele_text and 'easy apply' in ele_text.lower()):
-                    item["easy_apply"] = 'True'
+                    item["easy_apply"] = True
             except NoSuchElementException: 
                 print("no easy_apply found")
 
@@ -190,7 +190,7 @@ class DiceSpider(scrapy.Spider):
         if (has_remote_text(item['title'])) or \
             (has_remote_text(item['description_list'])) or \
             any(has_remote_text(skill) for skill in item['employment_skills']): 
-            item['is_remote'] = "True"
+            item['is_remote'] = True
             
         yield item
 

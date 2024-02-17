@@ -4,7 +4,7 @@ from datetime import datetime
 from tqdm import tqdm
 import time
 import threading
-from pipeline_util import closeOutScraperHelper, CYAN, RESET
+from pipeline_util import closeOutScraperHelper, CYAN, RESET, has_remote_text
 
 # Global variable to control the timer
 timer_running = True
@@ -108,7 +108,7 @@ jobs['employment_pay'] = jobs.apply(calculate_salary, axis=1)
 
 current_time = datetime.now().strftime("%b_%d_%Y-%I:%M-%p")
 
-# 1) Add new columns with an empty string
+# Add new columns with an empty string
 new_columns = ['job_board', 'date_updated', 'company_logo', 'employment_pay', 'employment_skills', 'easy_apply', 'scraped_at']
 for column in new_columns:
     if (column == 'job_board'):
@@ -120,7 +120,7 @@ for column in new_columns:
     else:
         jobs[column] = ''
 
-# 2) Change column names
+# Change column names
 jobs.rename(columns={
     'description': 'description_list',
     'job_type': 'employment_details',
@@ -128,10 +128,23 @@ jobs.rename(columns={
     'job_url': 'job_link'
 }, inplace=True)
 
-# 3) Remove unwanted columns
+# iterate over all jobs
+for job in jobs:
+
+    # add company link doesn't work the same for glassdoor (it's not standard)
+
+    # add is_remote
+    if (job["is_remote"] is None or job["is_remote"] == ""):
+        if (has_remote_text(job['title'])
+            or has_remote_text(job['description_list']) 
+            or any(has_remote_text(skill) for skill in job['employment_skills'])): 
+            job['is_remote'] = True
+        else:
+            job["is_remote"] = False
+
+# Remove unwanted columns
 columns_to_remove = ['site', 'interval', 'min_amount', 'max_amount', 'currency', 'num_urgent_words', 'emails', 'benefits']
 jobs.drop(columns=columns_to_remove, inplace=True)
-
 
 closeOutScraperHelper(
     start_time,
