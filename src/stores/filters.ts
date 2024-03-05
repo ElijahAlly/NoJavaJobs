@@ -1,9 +1,10 @@
-import { FilterType, FilterGroupsType, FilterLabelType, RangeGroupType } from '@/types/Filters';
+import { FilterType, FilterGroupsType, FilterLabelType, RangeGroupType, PostedDateLabelType } from '@/types/Filters';
 import { defineStore } from 'pinia';
 import { useJobsStore } from './jobs';
 
 export const useFiltersStore = defineStore('filters', {
     state: (): FilterType => ({
+        areFiltersActive: false,
         postedDate: {
             // * will deselect others
             any: { active: true, label: 'any' },
@@ -116,103 +117,160 @@ export const useFiltersStore = defineStore('filters', {
         handleRadioButtonClick(group: FilterGroupsType | '', label: FilterLabelType | '', index: number) {
             if (!label.length) return;
             if (group.length) {
-                const jobsStore = useJobsStore();
                 const jobs = useJobsStore().jobs;
 
                 switch (group) {
                     case 'postedDate':
+                        const setAllPostedDates = (exludeLabel: PostedDateLabelType | '' = '', setState: boolean) => {
+                            const keys = Object.keys(useFiltersStore().postedDate) as PostedDateLabelType[];
+                            keys.forEach((key)  => {
+                                if (exludeLabel.length && key !== exludeLabel) {
+                                    this.postedDate[key].active = setState;
+                                }
+                            }, []);
+                        }
+                        let daysBack = 0;
+
                         switch (label) {
                             case 'any':
                                 this.postedDate.any.active = !this.postedDate.any.active;
-                                
-                                if (this.postedDate.any.active) {
-                                    this.postedDate.today.active = false;
-                                    this.postedDate.sinceYesterday.active = false;
-                                    this.postedDate.past2Days.active = false;
-                                    this.postedDate.past3Days.active = false;
-                                    this.postedDate.past4Days.active = false;
-                                    this.postedDate.past5Days.active = false;
-                                    this.postedDate.past6Days.active = false;
-                                    this.postedDate.pastWeek.active = false;
-                                    this.postedDate.past2Weeks.active = false;
-                                    this.postedDate.past3Weeks.active = false;
-                                    this.postedDate.pastMonth.active = false;
-                                    this.postedDate.past2Months.active = false;
-                                    this.postedDate.past3Months.active = false;
-                                    this.postedDate.past4Months.active = false;
-                                    this.postedDate.past5Months.active = false;
-                                    this.postedDate.past6Months.active = false;
-                                    this.postedDate.pastYear.active = false;
-                                }
+                                if (this.postedDate[label].active) setAllPostedDates('any', false); 
                                 break;
 
                             case 'today':
                                 this.postedDate.today.active = !this.postedDate.today.active;
-
+                                if (this.postedDate[label].active) {
+                                    daysBack = 0;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'sinceYesterday':
                                 this.postedDate.sinceYesterday.active = !this.postedDate.sinceYesterday.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 1;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
                                 
                             case 'past2Days':
                                 this.postedDate.past2Days.active = !this.postedDate.past2Days.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 2;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past3Days':
                                 this.postedDate.past3Days.active = !this.postedDate.past3Days.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 3;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past4Days':
                                 this.postedDate.past4Days.active = !this.postedDate.past4Days.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 4;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past5Days':
                                 this.postedDate.past5Days.active = !this.postedDate.past5Days.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 5;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past6Days':
                                 this.postedDate.past6Days.active = !this.postedDate.past6Days.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 6;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'pastWeek':
                                 this.postedDate.pastWeek.active = !this.postedDate.pastWeek.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 7;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past2Weeks':
                                 this.postedDate.past2Weeks.active = !this.postedDate.past2Weeks.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 14;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past3Weeks':
                                 this.postedDate.past3Weeks.active = !this.postedDate.past3Weeks.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 21;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'pastMonth':
                                 this.postedDate.pastMonth.active = !this.postedDate.pastMonth.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 30;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past2Months':
                                 this.postedDate.past2Months.active = !this.postedDate.past2Months.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 60;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past3Months':
                                 this.postedDate.past3Months.active = !this.postedDate.past3Months.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 90;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past4Months':
                                 this.postedDate.past4Months.active = !this.postedDate.past4Months.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 120;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past5Months':
                                 this.postedDate.past5Months.active = !this.postedDate.past5Months.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 150;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'past6Months':
                                 this.postedDate.past6Months.active = !this.postedDate.past6Months.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 180;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
 
                             case 'pastYear':
                                 this.postedDate.pastYear.active = !this.postedDate.pastYear.active;
+                                if (this.postedDate[label].active) {
+                                    daysBack = 365;
+                                    setAllPostedDates(label, false);
+                                }
                                 break;
                         
                             default:
@@ -241,50 +299,22 @@ export const useFiltersStore = defineStore('filters', {
                             this.checkIfOtherFiltersAreActive();
                         } else {
                             this.postedDate.any.active = false;
-                            let date = new Date(); // postedDate.today is handled here
-                            if (this.postedDate.sinceYesterday.active) {
-                                date = new Date(date.setDate(date.getDate() - 1));
-                            } else if (this.postedDate.past2Days.active) {
-                                date = new Date(date.setDate(date.getDate() - 2));
-                            } else if (this.postedDate.past3Days.active) {
-                                date = new Date(date.setDate(date.getDate() - 3));
-                            } else if (this.postedDate.past4Days.active) {
-                                date = new Date(date.setDate(date.getDate() - 4));
-                            } else if (this.postedDate.past5Days.active) {
-                                date = new Date(date.setDate(date.getDate() - 5));
-                            } else if (this.postedDate.past6Days.active) {
-                                date = new Date(date.setDate(date.getDate() - 6));
-                            } else if (this.postedDate.pastWeek.active) {
-                                date = new Date(date.setDate(date.getDate() - 7));
-                            } else if (this.postedDate.past2Weeks.active) {
-                                date = new Date(date.setDate(date.getDate() - 14));
-                            } else if (this.postedDate.past3Weeks.active) {
-                                date = new Date(date.setDate(date.getDate() - 21));
-                            } else if (this.postedDate.pastMonth.active) {
-                                date = new Date(date.setDate(date.getDate() - 30));
-                            } else if (this.postedDate.past2Months.active) {
-                                date = new Date(date.setDate(date.getDate() - 60));
-                            } else if (this.postedDate.past3Months.active) {
-                                date = new Date(date.setDate(date.getDate() - 90));
-                            } else if (this.postedDate.past4Months.active) {
-                                date = new Date(date.setDate(date.getDate() - 120));
-                            } else if (this.postedDate.past5Months.active) {
-                                date = new Date(date.setDate(date.getDate() - 150));
-                            } else if (this.postedDate.past6Months.active) {
-                                date = new Date(date.setDate(date.getDate() - 180));
-                            } else if (this.postedDate.pastYear.active) {
-                                date = new Date(date.setDate(date.getDate() - 365));
-                            }
 
-                            jobsStore.filteredJobs = jobs.filter((job) => {
+                            // Calculate the comparison date
+                            let comparisonDate = new Date();
+                            comparisonDate.setDate(comparisonDate.getDate() - daysBack);
+                            // console.log('jobs', jobs);
+                            useJobsStore().filteredJobs = jobs.filter((job) => {
                                 const jobDate = new Date(job.date_posted);
-                                date.setHours(0, 0, 0, 0);
+                                comparisonDate.setHours(0, 0, 0, 0); // Normalize the time part for comparison
                                 jobDate.setHours(0, 0, 0, 0);
-                                return jobDate >= date;
-                            })
-                            jobsStore.setFilteredJobs();
+                                return jobDate >= comparisonDate;
+                            });
+                            
+                            console.log('filteredJobs', useJobsStore().filteredJobs);
+                            // jobsStore.setFilteredJobs();
                             this.handleFilterChange();
-                        } 
+                        }
                         break;
 
                     case 'employmentType':
@@ -682,17 +712,18 @@ export const useFiltersStore = defineStore('filters', {
                 && !this.easyApply.active
                 && !jobBoardsAreActive) {
                 // none of the filters are active (excluding search and location queries)
+                this.areFiltersActive = false;
                 // jobs should not be filtered
                 useJobsStore().filteredJobs = [];
                 return;
             } else {
+                this.areFiltersActive = true;
                 this.handleFilterChange();
             }
         },
         handleFilterChange() {
             // some filters are active (no need to check, but do handle the filters)
             // should set useJobsStore().filteredJobs with the filtered jobs from useJobsStore().jobs
-            
         }
     }
 });

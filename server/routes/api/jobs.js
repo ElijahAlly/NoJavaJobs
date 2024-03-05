@@ -10,7 +10,7 @@ router.get("/", function (req, res) {
   // console.log('id passed', req.params.id);
   Job.find()
     .then((jobs) => {
-      console.log('job', jobs);
+      // console.log('job', jobs);
       return res.json(jobs);
     })
     .catch(() => {

@@ -4,7 +4,7 @@
       If you're looking for jobs that require Java, you're on the wrong site :)
     </p>
     <div class="jobs-list">
-      <Filters />
+      <FiltersComponent />
       <JobCards />
     </div>
   </div>
@@ -16,7 +16,7 @@ import { defineComponent } from "vue";
 import { fetchAllJobs } from "@/api/jobs";
 import { JobType } from "@/types/Jobs";
 import JobCards from "@/components/Jobs/JobCards.vue";
-import Filters from "@/components/Jobs/Filters.vue";
+import FiltersComponent from "@/components/Jobs/Filters.vue";
 
 export default defineComponent({
   name: "JobsView",
@@ -44,7 +44,7 @@ export default defineComponent({
   },
   components: {
     JobCards,
-    Filters
+    FiltersComponent
   },
 });
 </script>

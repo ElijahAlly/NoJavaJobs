@@ -3,7 +3,7 @@
   <!-- * Add Color to job in the header based on rating & add colored "labels" for both public_rating/our_rating -->
   <div class="list-wrapper">
     <div class="list-header">
-      <div class="jobs-count">{{ formatJobsCount(jobs.length) }}</div>
+      <div class="jobs-count">{{ formatJobsCount(areFiltersActive ? filteredJobs.length : jobs.length) }}</div>
       <div class="actions">
         <div class="sorting">
           <div :class="`random-btn ${isSortedRandomly ? 'random-active' : ''}`" :onClick="sortRandomly">random</div>
@@ -16,70 +16,14 @@
         </div>
       </div>
     </div>
-    <div class="jobs-wrapper jobs-column">
-      <div v-if="jobs" v-for="(job, i) in paginatedJobs()" :key="i" class="card-component">
-        <div class="tags-cont" >
-          <span class="remote-tag" v-if="job.is_remote">remote</span>
-          <span v-if="!job.is_remote"></span>
-          <span class="easy-apply-tag" v-if="job.easy_apply">easy apply</span>
-          <span v-if="!job.easy_apply"></span>
-        </div>
-        <div class="header-cont">
-          <div class="company-cont">
-            <a
-              :href="job.company_link ? job.company_link : '#'"
-              class="company-logo"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                :src="handleCompanyLogo(job.company_logo)"
-                class="logo"
-                alt="company-logo"
-              />
-            </a>
-            <a
-              :href="job.company_link || '#'"
-              class="company-name"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <h5 class="name">{{ job.company }}</h5>
-            </a>
-          </div>
-          <div class="job-data">
-            <a 
-              class="listing-site"
-              :href="`https://${job.job_board}.com`"
-              target="_blank"
-              :style="{
-                color: getColorByJobBoard(job.job_board),
-                borderColor: getColorByJobBoard(job.job_board),
-              }"
-            >
-              {{ job.job_board }}
-            </a>
-            <h5 class="location">
-              {{ job.location && `${job.location}` }}
-            </h5>
-            <h5 class="date-posted">
-              posted {{ formatDate(job.date_posted) }}
-            </h5>
-          </div>
-        </div>
-        <div class="title-cont">
-          <a class="title" :title="job.title" :href="job.job_link">
-            {{ job.title }}
-          </a>
-        </div>
-        <div class="card-body">
-          <p>{{ 
-            job.description_list?.length
-            ? formatDescription(job.description_list) 
-            : 'Could not grab description. There may still be a description on the original job post. Click to find out.' 
-          }}</p>
-        </div>
-      </div>
+    <div v-if="areFiltersActive && filteredJobs.length" class="jobs-wrapper jobs-column">
+      <JobCard v-for="(job, i) in paginatedJobs(filteredJobs)" :job="job" :isColumn="isColumn" :key="i"/>
+    </div>
+    <div v-else-if="areFiltersActive && !filteredJobs.length" class="jobs-wrapper jobs-column">
+      <div class="no-jobs-found">No Jobs that match the filters were found. Please alter your search queyries and try again!</div>
+    </div>
+    <div v-else-if="!areFiltersActive" class="jobs-wrapper jobs-column">
+      <JobCard v-for="(job, i) in jobs.length ? paginatedJobs(jobs) : []" :job="job" :isColumn="isColumn" :key="i"/>
     </div>
     <div class="pagination">
       <div class="options">
@@ -110,6 +54,9 @@
 import { defineComponent } from "vue";
 import { mapState } from "pinia";
 import { useJobsStore } from "@/stores/jobs";
+import { JobType } from "@/types/Jobs";
+import { useFiltersStore } from "@/stores/filters";
+import JobCard from "./JobCard.vue";
 
 export default defineComponent({
   name: "JobCards",
@@ -123,8 +70,14 @@ export default defineComponent({
   },
   computed: {
     ...mapState(useJobsStore, ['jobs']),
+    ...mapState(useJobsStore, ['filteredJobs']),
+    ...mapState(useJobsStore, ['jobsRandomlyMixed']),
     ...mapState(useJobsStore, ['isSortedByMostRecent']),
     ...mapState(useJobsStore, ['isSortedRandomly']),
+    ...mapState(useFiltersStore, ['areFiltersActive']),
+  },
+  components: {
+    JobCard
   },
   methods: {
     scrollToTop() {
@@ -142,11 +95,10 @@ export default defineComponent({
     maxPage() {
       return Math.ceil(this.jobs.length / this.jobsPerPage);
     },
-    paginatedJobs() {
-      // console.log('jobs', this.jobs);
+    paginatedJobs(jobArr: JobType[]) {
       const start = (this.currentPage - 1) * this.jobsPerPage;
       const end = start + this.jobsPerPage;
-      return this.jobs.slice(start, end);
+      return jobArr.slice(start, end);
     },
     formatJobsCount(jobsCount: number) {
       return jobsCount === 1 ? '1 job' : `${jobsCount.toLocaleString()} jobs`
@@ -173,57 +125,6 @@ export default defineComponent({
         return require("../../assets/NoJavaJobs-Placeholder-Logo-Transparent.png");
       }
       return url;
-    },
-    handleCompanyLogo(url = ""): string {
-      if (
-        !url
-        || url.length < 1
-        || url === "https://cdn.filestackcontent.com/DKgl2bTTA3maTfcl1ugc"
-      ) {
-        return require("../../assets/NoJavaJobs-Placeholder-Logo-Transparent.png");
-      }
-      return url;
-    },
-    formatDescription(description = ""): string {
-      if (!description) return description;
-      return this.isColumn ? description.slice(0, 333).trimEnd() + '...' : description.slice(0, 777).trimEnd() + '...';
-    },
-    getColorByJobBoard(jobBoard = ""): string {
-      switch (jobBoard.toLowerCase()) {
-        case 'dice':
-          return 'crimson'
-        case 'indeed':
-          return 'blue'
-        case 'linkedin':
-          return 'dodgerblue'
-        case 'glassdoor':
-          return 'green'
-        case 'ziprecruiter':
-          return 'limegreen'
-      
-        default:
-          return '#f66d65'
-      }
-    },
-    formatDate(dateString: string): string {
-      const now = new Date();
-      const date = new Date(dateString);
-      const diffInMs = now.getTime() - date.getTime();
-      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-
-      if (diffInHours < 24) {
-        return `${diffInHours} hr${diffInHours > 1 ? 's' : ''} ago`;
-      } 
-
-      const diffInDays = Math.floor(diffInHours / 24);
-      
-      if (diffInDays <= 30) {
-        return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
-      } else {
-        // Format as "month day" for dates older than 30 days
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        return `on ${monthNames[date.getMonth()]} ${date.getDate()}`;
-      }
     },
     displayAsRow() {
       if (this.isRow) return;
@@ -252,7 +153,7 @@ export default defineComponent({
 </script>
 
 <!--
-    * // Todo: Implement scroll snapping -> https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_scroll_snap/Basic_concepts 
+  * // Todo: Implement scroll snapping -> https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_scroll_snap/Basic_concepts 
 -->
 
 <style scoped lang="scss">
@@ -376,165 +277,9 @@ export default defineComponent({
       background-color: transparent;
     } 
     
-    .card-component {
-      scroll-snap-align: start;
-      scroll-behavior: smooth;
-      border: 1px solid #486071;
-      width: 45vw;
-      max-width: 600px;
-      min-width: 300px;
-      margin-bottom: 24px;
-      margin-left: 3px;
-      padding: 21px;
+    // .card-wrapper {
       
-      &:hover {
-        border-left-width: 3px;
-        border-left-color: #f66d65;
-        margin-left: 1px;
-      }
-      
-      &:hover > .company-logo {
-        margin-left: 0px;
-      }
-      
-      @media (max-width: 800px) {
-        min-width: 80%;
-      }
-      
-      .tags-cont {
-        display: flex;
-        width: 100%;
-        min-height: fit-content;
-        align-items: center;
-        justify-content: center;
-
-        span {
-          background-color: transparent;
-          color: white;
-          padding: 6px;
-        }
-
-        .remote-tag {
-          background-color: rgba(157, 101, 246, 0.81);
-          min-width: 51px;
-          margin: 0 6px;
-        }
-
-        .easy-apply-tag {
-          background-color: rgba(0, 128, 0, 0.81);
-          min-width: 51px;
-          margin: 0 6px;
-        }
-      }
-
-      .header-cont {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-        user-select: none;
-        margin-bottom: 3px;
-        
-        .company-cont {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          
-          .company-logo {
-            margin: 2px;
-            height: 60px;
-            width: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: white;
-            
-            .logo {
-              cursor: pointer;
-              width: 100%;
-              height: auto;
-              object-fit: cover;
-              
-              &:hover {
-                box-shadow: whitesmoke 1px 1px 1px 1px;
-              }
-            }
-          }
-          
-          .company-name {
-            text-decoration: none;
-            
-            .name {
-              cursor: pointer;
-              width: fit-content;
-              display: inline-flex;
-              flex-wrap: nowrap;
-              max-width: 100%; 
-              font-weight: 400;
-              font-size: medium;
-              margin: 0;
-              color: black;
-              text-underline-offset: 2px;
-              
-              &:hover {
-                text-decoration: 1px solid underline black; 
-              }
-            }
-          }
-        }
-        
-        .job-data {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          align-items: flex-end;
-          
-          .listing-site {
-            cursor: pointer;
-            width: fit-content;
-            padding: 9px;
-            font-weight: 400;
-            font-size: small;
-            transition: 0.21s;
-            text-decoration: none;
-            border: 1px solid crimson;
-            color: crimson;
-            background-color: inherit;
-            
-            &:hover {
-              background-color: whitesmoke;
-            }
-          }
-          
-          .date-posted, .location {
-            display: flex;
-            justify-content: end;
-            width: fit-content;
-            min-width: 124px;
-            margin: 0;
-            font-weight: 400;
-            font-size: small;
-            color: black;
-          }
-        }
-        
-      }
-      
-      .title-cont {
-        margin-top: 12px;
-
-        .title {
-          color: crimson;
-          cursor: pointer;
-          width: fit-content;
-          text-underline-offset: 2px;
-          text-decoration-thickness: 1px;
-          
-          &:hover {
-            text-decoration-thickness: 2px;
-          }
-        }
-      }
-    }
+    // }
   }
 
   .jobs-column {
@@ -552,87 +297,9 @@ export default defineComponent({
     width: 45vw;
     box-shadow: 0px 0px 18px -9px #486071 inset;
 
-    .card-component {
-      scroll-snap-align: start;
-      height: 51vh;
-      width: 75%;
-      min-width: 75%;
-      margin-right: 21px;
+    // .card-wrapper {
       
-      &:hover {
-        border-left-width: 3px;
-        border-left-color: #f66d65;
-        margin-left: 1px;
-      }
-      
-      &:hover > .company-logo {
-        margin-left: 0px;
-      }
-      
-      @media (max-width: 800px) {
-        min-width: 80%;
-      }
-      
-      .header-cont {
-        margin-bottom: 21px;
-
-      //   .company-cont {
-          
-      //     .company-logo {
-            
-      //       .logo {
-              
-      //         &:hover {
-
-      //         }
-      //       }
-      //     }
-          
-          // .company-name {
-            
-          //   .name {
-              
-              
-          //     &:hover {
-
-          //     }
-          //   }
-          // }
-        // }
-        
-        // .job-data {
-          
-          
-          // .listing-site {
-            
-            
-          //   &:hover {
-
-          //   }
-          // }
-          
-          // .date-posted, .location {
-            
-          // }
-        // }
-        
-      }
-      
-      .title-cont {
-        
-        .title {
-          color: crimson;
-          cursor: pointer;
-          width: fit-content;
-          text-underline-offset: 2px;
-          text-decoration-thickness: 1px;
-          
-          &:hover {
-            text-decoration-thickness: 2px;
-          }
-        }
-      }
-    }
+    // }
   }
 
   .pagination {

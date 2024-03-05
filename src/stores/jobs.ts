@@ -69,7 +69,7 @@ export const useJobsStore = defineStore('jobs', {
             // filters are active
             this.filtersActive = true;
         },
-        setMostRecentJobs() {
+        setMostRecentJobs() { // TODO: Sorting not working
             if (!this.jobs) return []; // filters are active (or for some other reason) no jobs are showing
             const jobs = this.filteredJobs.length ? this.filteredJobs : this.jobs;
             console.log('jobs', jobs);
@@ -243,7 +243,7 @@ export const useJobsStore = defineStore('jobs', {
             });
         },
         setFilteredJobs() {
-            console.log('filteredJobs', this.filteredJobs);
+            // console.log('filteredJobs', this.filteredJobs);
             if (this.filteredJobs.length) {
                 const jobs = this.isSortedByMostRecent ? this.jobsMostRecent : this.jobsRandomlyMixed;
 
@@ -251,7 +251,7 @@ export const useJobsStore = defineStore('jobs', {
                     this.filteredJobs.some(stateJob => stateJob._id === job._id)
                 )
                 this.jobs = this.filteredJobs;
-                console.log('this.jobs', this.jobs); 
+                // console.log('this.jobs', this.jobs); 
             } else if (!this.filteredJobs.length) {
                 this.jobs = this.getJobsListBasedOnActiveSorting();
             }

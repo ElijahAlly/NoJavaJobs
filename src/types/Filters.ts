@@ -11,6 +11,7 @@ type RangeType = {
 }
 
 export type FilterType = {
+    areFiltersActive: boolean
     postedDate: {
         // * will deselect others
         any: RadioType
@@ -99,8 +100,9 @@ export type FilterType = {
     jobBoards: RadioType[]
 }
 
-type PostedDateLabelType = (
-    'today'
+export type PostedDateLabelType = (
+    'any'
+    | 'today'
     | 'sinceYesterday'
     | 'past2Days'
     | 'past3Days'

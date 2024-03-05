@@ -320,11 +320,10 @@
                     Skills
                    <span class="arrow">></span> 
                 </h2>
-                <div class="content">
+                <div class="content" v-if="skills">
                     <!-- * make input into separate component (re-use for excluded keywords filter) -->
                     <input type="text" class="skill-input" /> 
-                    <div
-                        v-if="skills"
+                    <div 
                         v-for="(skill, i) in skills"
                         :key="i"
                         class="radio-container skill"
@@ -340,10 +339,9 @@
                     Excluded Keywords
                     <span class="arrow">></span> 
                 </h2>
-                <div class="content">
+                <div class="content" v-if="excludedKeywords">
                     <input type="text" class="excluded-keyword-input" />
                     <div
-                        v-if="excludedKeywords"
                         v-for="(keyword, i) in excludedKeywords"
                         :key="i"
                         class="radio-container excluded-keyword"
@@ -359,9 +357,8 @@
                     Job Board
                     <span class="arrow">></span> 
                 </h2>
-                <div class="content">
+                <div class="content" v-if="jobBoards">
                     <div 
-                        v-if="jobBoards" 
                         v-for="(jobBoard, i) in jobBoards" 
                         :key="i"
                         class="radio-container jobs-board"
@@ -396,7 +393,7 @@ import { mapState } from "pinia";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-    name: "Filters",
+    name: "FiltersComponent",
     computed: {
         ...mapState(useFiltersStore, ['postedDate']),
         ...mapState(useFiltersStore, ['employmentType']),
@@ -542,7 +539,7 @@ export default defineComponent({
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: end;
+            justify-content: flex-end;
             width: 100%;
             height: fit-content;
             min-height: 5em;
@@ -572,7 +569,7 @@ export default defineComponent({
                 font-size: 1.5em;
                 font-weight: 600;
                 display: flex;
-                align-items: end;
+                align-items: flex-end;
                 justify-content: space-between;
                 width: inherit;
                 color: #486071;
